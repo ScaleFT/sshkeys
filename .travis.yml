@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - 1.6
+  - 1.7
+  - master
+
+install:
+ - go get -u github.com/stretchr/testify/require
