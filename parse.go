@@ -30,6 +30,8 @@ var ErrIncorrectPassword = errors.New("sshkeys: Invalid Passphrase")
 
 const keySizeAES256 = 32
 
+// ParseEncryptedPrivateKey returns a Signer from an encrypted private key. It supports
+// the same keys as ParseEncryptedRawPrivateKey.
 func ParseEncryptedPrivateKey(data []byte, passphrase []byte) (ssh.Signer, error) {
 	key, err := ParseEncryptedRawPrivateKey(data, passphrase)
 	if err != nil {
@@ -39,6 +41,12 @@ func ParseEncryptedPrivateKey(data []byte, passphrase []byte) (ssh.Signer, error
 	return ssh.NewSignerFromKey(key)
 }
 
+// ParseEncryptedRawPrivateKey returns a private key from an encrypted private key. It
+// supports RSA (PKCS#1 or OpenSSH), DSA (OpenSSL), and ECDSA private keys.
+//
+// ErrIncorrectPassword will be returned if the supplied passphrase is wrong,
+// but some formats like RSA in PKCS#1 detecting a wrong passphrase is difficult,
+// and other parse errors may be returned.
 func ParseEncryptedRawPrivateKey(data []byte, passphrase []byte) (interface{}, error) {
 	var err error
 
