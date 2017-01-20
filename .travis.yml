@@ -6,4 +6,4 @@ go:
   - master
 
 install:
- - go get -u github.com/stretchr/testify/require
+ - go get -u github.com/stretchr/testify/require github.com/dchest/bcrypt_pbkdf
