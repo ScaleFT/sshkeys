@@ -5,7 +5,7 @@
 
 `sshkeys` provides utilities for parsing and marshalling cryptographic keys used for SSH, in both cleartext and encrypted formats.
 
-[ssh#ParseRawPrivateKey](https://godoc.org/golang.org/x/crypto/ssh#ParseRawPrivateKey) only supports parsing a subset of the formats `sshkeys` supports, does not support parsing encrypted private keys, and does not support marshalling.
+[ssh.ParseRawPrivateKey](https://godoc.org/golang.org/x/crypto/ssh#ParseRawPrivateKey) only supports parsing a subset of the formats `sshkeys` supports, does not support parsing encrypted private keys, and does not support marshalling.
 
 ## Supported Formats
 
