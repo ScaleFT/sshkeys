@@ -21,18 +21,25 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// Format of private key to use when Marshaling.
 type Format int
 
 const (
+	// FormatOpenSSHv1 encodes a private key using OpenSSH's PROTOCOL.key format: https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key
 	FormatOpenSSHv1 Format = iota
+	// FormatClassicPEM encodes private keys in PEM, with a key-specific encoding, as used by OpenSSH.
 	FormatClassicPEM
 )
 
+// MarshalOptions provides the Marshal function format and encryption options.
 type MarshalOptions struct {
+	// Passphrase to encrypt private key with, if nil, the key will not be encrypted.
 	Passphrase []byte
-	Format     Format
+	// Format to encode the private key in.
+	Format Format
 }
 
+// Marshal converts a private key into an optionally encrypted format.
 func Marshal(pk interface{}, opts *MarshalOptions) ([]byte, error) {
 	switch opts.Format {
 	case FormatOpenSSHv1:
@@ -77,12 +84,12 @@ func marshalPem(pk interface{}, opts *MarshalOptions) ([]byte, error) {
 			return nil, err
 		}
 		return pem.EncodeToMemory(block), nil
-	} else {
-		return pem.EncodeToMemory(&pem.Block{
-			Type:  pemType,
-			Bytes: plain,
-		}), nil
 	}
+
+	return pem.EncodeToMemory(&pem.Block{
+		Type:  pemType,
+		Bytes: plain,
+	}), nil
 }
 
 type dsaOpenssl struct {
