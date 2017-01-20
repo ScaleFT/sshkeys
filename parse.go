@@ -1,3 +1,9 @@
+// Portions of this file are based on https://github.com/golang/crypto/blob/master/ssh/keys.go
+//
+// Copyright 2012 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package sshkeys
 
 import (
@@ -19,7 +25,8 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-var IncorrectPasswordError = errors.New("sshkeys: Invalid Passphrase")
+// ErrIncorrectPassword is returned when the supplied passphrase was not correct for an encrypted private key.
+var ErrIncorrectPassword = errors.New("sshkeys: Invalid Passphrase")
 
 const keySizeAES256 = 32
 
@@ -43,7 +50,7 @@ func ParseEncryptedRawPrivateKey(data []byte, passphrase []byte) (interface{}, e
 	if x509.IsEncryptedPEMBlock(block) {
 		data, err = x509.DecryptPEMBlock(block, passphrase)
 		if err == x509.IncorrectPasswordError {
-			return nil, IncorrectPasswordError
+			return nil, ErrIncorrectPassword
 		}
 		if err != nil {
 			return nil, err
@@ -60,7 +67,7 @@ func ParseEncryptedRawPrivateKey(data []byte, passphrase []byte) (interface{}, e
 			// so sometimes DecryptPEMBlock works, but ParsePKCS1PrivateKey fails with an asn1 error.
 			// We are just catching the most common prefix here...
 			if strings.HasPrefix(err.Error(), "asn1: structure error") {
-				return nil, IncorrectPasswordError
+				return nil, ErrIncorrectPassword
 			}
 			return nil, err
 		}
@@ -138,13 +145,13 @@ func parseOpenSSHPrivateKey(data []byte, passphrase []byte) (interface{}, error)
 
 	if err := ssh.Unmarshal(privateKeyBytes, &pk1); err != nil {
 		if encrypted {
-			return nil, IncorrectPasswordError
+			return nil, ErrIncorrectPassword
 		}
 		return nil, err
 	}
 
 	if pk1.Check1 != pk1.Check2 {
-		return nil, IncorrectPasswordError
+		return nil, ErrIncorrectPassword
 	}
 
 	// we only handle ed25519 and rsa keys currently
