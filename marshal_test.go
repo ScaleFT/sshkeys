@@ -16,10 +16,10 @@ func testSigners(t *testing.T, name string, a ssh.Signer, b ssh.Signer) {
 
 	sign := []byte("hello world")
 	sig, err := a.Sign(rand.Reader, sign)
-	require.NoError(t, err, "signer failed for "+name)
+	require.NoError(t, err, "signer failed for %s", name)
 
 	err = b.PublicKey().Verify(sign, sig)
-	require.NoError(t, err, "verify failed for "+name)
+	require.NoError(t, err, "verify failed for %s", name)
 }
 
 func TestMarshalOldFormat(t *testing.T) {
@@ -31,8 +31,8 @@ func TestMarshalOldFormat(t *testing.T) {
 		}
 		t.Run(k.Name, func(t *testing.T) {
 			pk, err := sshkeys.ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
-			require.NoError(t, err, "error parsing "+k.Name)
-			require.NotNil(t, pk, "nil return from parsing "+k.Name)
+			require.NoError(t, err, "error parsing %s", k.Name)
+			require.NotNil(t, pk, "nil return from parsing %s", k.Name)
 
 			signer, err := ssh.NewSignerFromKey(pk)
 			require.NoError(t, err)
@@ -43,11 +43,11 @@ func TestMarshalOldFormat(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			require.NotNil(t, data, "nil return from marshaling "+k.Name)
+			require.NotNil(t, data, "nil return from marshaling %s", k.Name)
 
 			pk2, err := sshkeys.ParseEncryptedRawPrivateKey(data, password)
-			require.NoError(t, err, "error from parsing "+k.Name)
-			require.NotNil(t, pk2, "nil return from parsing "+k.Name)
+			require.NoError(t, err, "error from parsing %s", k.Name)
+			require.NotNil(t, pk2, "nil return from parsing %s", k.Name)
 
 			signer2, err := ssh.NewSignerFromKey(pk2)
 			require.NoError(t, err)
@@ -66,8 +66,8 @@ func TestMarshalNewFormat(t *testing.T) {
 
 		t.Run(k.Name, func(t *testing.T) {
 			pk, err := sshkeys.ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
-			require.NoError(t, err, "error parsing "+k.Name)
-			require.NotNil(t, pk, "nil return from parsing "+k.Name)
+			require.NoError(t, err, "error parsing %s", k.Name)
+			require.NotNil(t, pk, "nil return from parsing %s", k.Name)
 
 			signer, err := ssh.NewSignerFromKey(pk)
 			require.NoError(t, err)
@@ -78,11 +78,11 @@ func TestMarshalNewFormat(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			require.NotNil(t, data, "nil return from marshaling "+k.Name)
+			require.NotNil(t, data, "nil return from marshaling %s", k.Name)
 
 			pk2, err := sshkeys.ParseEncryptedRawPrivateKey(data, password)
-			require.NoError(t, err, "error from parsing "+k.Name)
-			require.NotNil(t, pk2, "nil return from parsing "+k.Name)
+			require.NoError(t, err, "error from parsing %s", k.Name)
+			require.NotNil(t, pk2, "nil return from parsing %s", k.Name)
 
 			signer2, err := ssh.NewSignerFromKey(pk2)
 			require.NoError(t, err)
