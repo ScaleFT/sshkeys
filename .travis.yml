@@ -1,9 +1,16 @@
 language: go
 
-go:
-  - 1.6
-  - 1.7
-  - master
+sudo: false
 
-install:
- - go get -u github.com/stretchr/testify/require github.com/dchest/bcrypt_pbkdf
+go:
+  - 1.11.x
+  - tip
+
+env:
+  - GO111MODULE=on
+
+before_install:
+  - travis_retry go mod download
+
+script:
+  - go test -v ./...
