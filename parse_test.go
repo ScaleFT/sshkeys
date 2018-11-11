@@ -1,8 +1,9 @@
-package sshkeys
+package sshkeys_test
 
 import (
 	"testing"
 
+	"github.com/ScaleFT/sshkeys"
 	"github.com/ScaleFT/sshkeys/testdata"
 	"github.com/stretchr/testify/require"
 )
@@ -10,7 +11,7 @@ import (
 func TestParse(t *testing.T) {
 	for _, k := range testdata.PEMBytes {
 		t.Run(k.Name, func(t *testing.T) {
-			pk, err := ParseEncryptedPrivateKey(k.PEMBytes, nil)
+			pk, err := sshkeys.ParseEncryptedPrivateKey(k.PEMBytes, nil)
 			require.NoError(t, err, "error parsing "+k.Name)
 			require.NotNil(t, pk, "nil return from parsing "+k.Name)
 		})
@@ -21,12 +22,12 @@ func TestEncryptedParse(t *testing.T) {
 	wrongKey := []byte("hello world")
 	for _, k := range testdata.PEMEncryptedKeys {
 		t.Run(k.Name, func(t *testing.T) {
-			pk, err := ParseEncryptedPrivateKey(k.PEMBytes, wrongKey)
+			pk, err := sshkeys.ParseEncryptedPrivateKey(k.PEMBytes, wrongKey)
 			require.Error(t, err, "expected error from "+k.Name)
-			require.Equal(t, err, ErrIncorrectPassword, "expected error from "+k.Name)
+			require.Equal(t, err, sshkeys.ErrIncorrectPassword, "expected error from "+k.Name)
 			require.Nil(t, pk, "non-nil return from parsing "+k.Name)
 
-			pk, err = ParseEncryptedPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
+			pk, err = sshkeys.ParseEncryptedPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
 			require.NoError(t, err)
 			require.NotNil(t, pk, "nil return from parsing "+k.Name)
 		})

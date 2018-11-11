@@ -1,4 +1,4 @@
-package sshkeys
+package sshkeys_test
 
 import (
 	"crypto/rand"
@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
+	"github.com/ScaleFT/sshkeys"
 	"github.com/ScaleFT/sshkeys/testdata"
 	"github.com/stretchr/testify/require"
 )
@@ -29,22 +30,22 @@ func TestMarshalOldFormat(t *testing.T) {
 			continue
 		}
 		t.Run(k.Name, func(t *testing.T) {
-			pk, err := ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
+			pk, err := sshkeys.ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
 			require.NoError(t, err, "error parsing "+k.Name)
 			require.NotNil(t, pk, "nil return from parsing "+k.Name)
 
 			signer, err := ssh.NewSignerFromKey(pk)
 			require.NoError(t, err)
 
-			data, err := Marshal(pk, &MarshalOptions{
+			data, err := sshkeys.Marshal(pk, &sshkeys.MarshalOptions{
 				Passphrase: password,
-				Format:     FormatClassicPEM,
+				Format:     sshkeys.FormatClassicPEM,
 			})
 
 			require.NoError(t, err)
 			require.NotNil(t, data, "nil return from marshaling "+k.Name)
 
-			pk2, err := ParseEncryptedRawPrivateKey(data, password)
+			pk2, err := sshkeys.ParseEncryptedRawPrivateKey(data, password)
 			require.NoError(t, err, "error from parsing "+k.Name)
 			require.NotNil(t, pk2, "nil return from parsing "+k.Name)
 
@@ -64,22 +65,22 @@ func TestMarshalNewFormat(t *testing.T) {
 		}
 
 		t.Run(k.Name, func(t *testing.T) {
-			pk, err := ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
+			pk, err := sshkeys.ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
 			require.NoError(t, err, "error parsing "+k.Name)
 			require.NotNil(t, pk, "nil return from parsing "+k.Name)
 
 			signer, err := ssh.NewSignerFromKey(pk)
 			require.NoError(t, err)
 
-			data, err := Marshal(pk, &MarshalOptions{
+			data, err := sshkeys.Marshal(pk, &sshkeys.MarshalOptions{
 				Passphrase: password,
-				Format:     FormatOpenSSHv1,
+				Format:     sshkeys.FormatOpenSSHv1,
 			})
 
 			require.NoError(t, err)
 			require.NotNil(t, data, "nil return from marshaling "+k.Name)
 
-			pk2, err := ParseEncryptedRawPrivateKey(data, password)
+			pk2, err := sshkeys.ParseEncryptedRawPrivateKey(data, password)
 			require.NoError(t, err, "error from parsing "+k.Name)
 			require.NotNil(t, pk2, "nil return from parsing "+k.Name)
 
