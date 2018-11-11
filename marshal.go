@@ -1,6 +1,7 @@
 package sshkeys
 
 import (
+	"crypto/aes"
 	"crypto/cipher"
 	"crypto/dsa"
 	"crypto/ecdsa"
@@ -14,9 +15,6 @@ import (
 	mrand "math/rand"
 
 	"github.com/dchest/bcrypt_pbkdf"
-
-	"crypto/aes"
-
 	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/ssh"
 )

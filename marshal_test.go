@@ -4,11 +4,10 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"golang.org/x/crypto/ssh"
-
 	"github.com/ScaleFT/sshkeys"
 	"github.com/ScaleFT/sshkeys/testdata"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/crypto/ssh"
 )
 
 func testSigners(t *testing.T, name string, a ssh.Signer, b ssh.Signer) {
