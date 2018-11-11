@@ -1,11 +1,12 @@
-// Copyright 2014 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package testdata
 
-var PEMBytes = map[string][]byte{
-	"dsa": []byte(`-----BEGIN DSA PRIVATE KEY-----
+var PEMBytes = []struct {
+	Name     string
+	PEMBytes []byte
+}{
+	{
+		Name: "dsa",
+		PEMBytes: []byte(`-----BEGIN DSA PRIVATE KEY-----
 MIIBuwIBAAKBgQD6PDSEyXiI9jfNs97WuM46MSDCYlOqWw80ajN16AohtBncs1YB
 lHk//dQOvCYOsYaE+gNix2jtoRjwXhDsc25/IqQbU1ahb7mB8/rsaILRGIbA5WH3
 EgFtJmXFovDz3if6F6TzvhFpHgJRmLYVR8cqsezL3hEZOvvs2iH7MorkxwIVAJHD
@@ -18,13 +19,19 @@ nOwuxb0Kce+gWI8voWcqC9cyRm09jGzu2Ab3Bhtpg8JJ8L7gS3MRZK4CFEx4UAfY
 Fmsr0W6fHB9nhS4/UXM8
 -----END DSA PRIVATE KEY-----
 `),
-	"ecdsa": []byte(`-----BEGIN EC PRIVATE KEY-----
+	},
+	{
+		Name: "ecdsa",
+		PEMBytes: []byte(`-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEINGWx0zo6fhJ/0EAfrPzVFyFC9s18lBt3cRoEDhS3ARooAoGCCqGSM49
 AwEHoUQDQgAEi9Hdw6KvZcWxfg2IDhA7UkpDtzzt6ZqJXSsFdLd+Kx4S3Sx4cVO+
 6/ZOXRnPmNAlLUqjShUsUBBngG0u2fqEqA==
 -----END EC PRIVATE KEY-----
 `),
-	"rsa": []byte(`-----BEGIN RSA PRIVATE KEY-----
+	},
+	{
+		Name: "rsa",
+		PEMBytes: []byte(`-----BEGIN RSA PRIVATE KEY-----
 MIICXAIBAAKBgQC8A6FGHDiWCSREAXCq6yBfNVr0xCVG2CzvktFNRpue+RXrGs/2
 a6ySEJQb3IYquw7HlJgu6fg3WIWhOmHCjfpG0PrL4CRwbqQ2LaPPXhJErWYejcD8
 Di00cF3677+G10KMZk9RXbmHtuBFZT98wxg8j+ZsBMqGM1+7yrWUvynswQIDAQAB
@@ -40,15 +47,19 @@ z26i6XVMeYXAWZMTloMCQBbpGgEERQpeUknLBqUHhg/wXF6+lFA+vEGnkY+Dwab2
 KCXFGd+SQ5GdUcEMe9isUH6DYj/6/yCDoFrXXmpQb+M=
 -----END RSA PRIVATE KEY-----
 `),
-	"ed25519": []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-QyNTUxOQAAACA+3f7hS7g5UWwXOGVTrMfhmxyrjqz7Sxxbx7I1j8DvvwAAAJhAFfkOQBX5
-DgAAAAtzc2gtZWQyNTUxOQAAACA+3f7hS7g5UWwXOGVTrMfhmxyrjqz7Sxxbx7I1j8Dvvw
-AAAEAaYmXltfW6nhRo3iWGglRB48lYq0z0Q3I3KyrdutEr6j7d/uFLuDlRbBc4ZVOsx+Gb
-HKuOrPtLHFvHsjWPwO+/AAAAE2dhcnRvbm1AZ2FydG9ubS14cHMBAg==
------END OPENSSH PRIVATE KEY-----
+	},
+	{
+		Name: "user",
+		PEMBytes: []byte(`-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEILYCAeq8f7V4vSSypRw7pxy8yz3V5W4qg8kSC3zJhqpQoAoGCCqGSM49
+AwEHoUQDQgAEYcO2xNKiRUYOLEHM7VYAp57HNyKbOdYtHD83Z4hzNPVC4tM5mdGD
+PLL8IEwvYu2wq+lpXfGQnNMbzYf9gspG0w==
+-----END EC PRIVATE KEY-----
 `),
-	"rsa-openssh-format": []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
+	},
+	{
+		Name: "rsa-openssh-format",
+		PEMBytes: []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAlwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAIEAwa48yfWFi3uIdqzuf9X7C2Zxfea/Iaaw0zIwHudpF8U92WVIiC5l
 oEuW1+OaVi3UWfIEjWMV1tHGysrHOwtwc34BPCJqJknUQO/KtDTBTJ4Pryhw1bWPC999Lz
@@ -64,12 +75,18 @@ X1ViJuqqcQnJPVzpgSL826EC2xwOECTqoY8uvFpUdD7CtpksIxNVqRIhuNOlz0lqEAAABB
 ANkaHTTaPojClO0dKJ/Zjs7pWOCGliebBYprQ/Y4r9QLBkC/XaWMS26gFIrjgC7D2Rv+rZ
 wSD0v0RcmkITP1ZR0AAAAYcHF1ZXJuYUBMdWNreUh5ZHJvLmxvY2FsAQID
 -----END OPENSSH PRIVATE KEY-----`),
-	"user": []byte(`-----BEGIN EC PRIVATE KEY-----
-MHcCAQEEILYCAeq8f7V4vSSypRw7pxy8yz3V5W4qg8kSC3zJhqpQoAoGCCqGSM49
-AwEHoUQDQgAEYcO2xNKiRUYOLEHM7VYAp57HNyKbOdYtHD83Z4hzNPVC4tM5mdGD
-PLL8IEwvYu2wq+lpXfGQnNMbzYf9gspG0w==
------END EC PRIVATE KEY-----
+	},
+	{
+		Name: "ed25519-openssh-format",
+		PEMBytes: []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACA+3f7hS7g5UWwXOGVTrMfhmxyrjqz7Sxxbx7I1j8DvvwAAAJhAFfkOQBX5
+DgAAAAtzc2gtZWQyNTUxOQAAACA+3f7hS7g5UWwXOGVTrMfhmxyrjqz7Sxxbx7I1j8Dvvw
+AAAEAaYmXltfW6nhRo3iWGglRB48lYq0z0Q3I3KyrdutEr6j7d/uFLuDlRbBc4ZVOsx+Gb
+HKuOrPtLHFvHsjWPwO+/AAAAE2dhcnRvbm1AZ2FydG9ubS14cHMBAg==
+-----END OPENSSH PRIVATE KEY-----
 `),
+	},
 }
 
 var PEMEncryptedKeys = []struct {
@@ -77,8 +94,8 @@ var PEMEncryptedKeys = []struct {
 	EncryptionKey string
 	PEMBytes      []byte
 }{
-	0: {
-		Name:          "rsa-encrypted",
+	{
+		Name:          "rsa-encrypted-aes256-cbc",
 		EncryptionKey: "r54-G0pher_t3st$",
 		PEMBytes: []byte(`-----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
@@ -112,9 +129,41 @@ MvMLGkYgQ4Utwnd98mtqa0jr0hK2TcOSFir3AqVvXN3XJj4cVULkrXe4Im1laWgp
 -----END RSA PRIVATE KEY-----
 `),
 	},
-
-	1: {
-		Name:          "dsa-encrypted",
+	{
+		Name:          "rsa-encrypted-aes256-ctr",
+		EncryptionKey: "Password-Test_1234",
+		PEMBytes: []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABBb5bVJRJ
+OyqhVNPrtqeQR7AAAAEAAAAAEAAAEXAAAAB3NzaC1yc2EAAAADAQABAAABAQDGl3Dz88NH
+mWH65wsj94ffJHmXf09tYTIbJKwSADexk8ETQMBG0CjgM5B5Xu9J9JzTG3QkXFkery9tWb
+uPCh4y2hz1svJe3gg37YV3Pp98Fmc4rTAKozlJLUdZA8kmURXmGhUe8p6IBT/EF8/ggGqC
+vphqBwEzQz8jphAzkDBNFfQCpqEblnwG2Kw/Tegso1BPI9EsN3o5wrURCLN8fjPxxEcmWR
+dGcCDuUqAbwnaJRGup0iJPal7YIVSi3uB7VCK8iWeDtsGLpOAnLojJRzGccn6pnFb1Pjes
+35VWkhyv1KH5tDjmq0fA+P40ffSV0T1OZ7J0ZyR/BC0yV0gypHCPAAAD0LaQ/bL0QaRXRv
+qHn1A+xJIWtkHskTX0APDZ+yyUHye9oaR5LBkvv6x8wPH3j8jb/k6eZ1zfv3g3Xkm5qUOW
+dI0Lu1KPrwxh+f3Mco7LCDqHsI+j72uTo3sNJjsxhrRuX31rmKUwP4MWNecwVT9uN6Y+lr
+BjFKfZX3RTEfYzgTh2skPVco90x0Zfbj/Q8IWaPpZFdLzogB+kERZrA7HT8SIGmzLOKDCX
+KjVP92RkxvleC5T7XcTsXVkVelnfcMQ7sK6tKu6gk3+TUm0FUpOPoPxM1oRfVdyV2Fc3iI
+tq17lkexQ3PqAjlSkM9VSz8f0ZEKqkQ2oK7m+TPoasMSkn/Blxs6ZnNiToH9Y9xawva/M5
+JW822Zbhu8vVGBtpB9DVaHAj3JPAc+l2EwSlHPbyWoNfmQcHilonp+mHru2B/fH+vXOYO5
++T1Fp0gfQMifrDISgcNbTmhKYhnWnnpV6a3JGIe+cUWGzeYn9/GGZAJOHyAyA7Uy70e/2M
+9ps4AY2rsS4Fu21BHuskbs9X1ujszIk0prXEN5NAyvKDsTT9chQRjo/VbwWpeAN9adF1Gs
+yHnOkVT4Vc1reCLi0hNGcqUVH+LAQwTcaEnNaY1mAdgSBY+/8CnSDkhffixzT5ob5HbfLG
+M2Hax9/pDX9hlLoh+eHz5pLoKzW+YDo1/NypS7goAsHPkiMTpn+oM1bqtjxDLeNmh3gCdW
+UlJYt8rUT4G0t8JFIhTlVUNULaRYVIypGPgKdkVqUYo3lRW959cxgAC92XepjBISRACQCT
+jYBWu2RHzbgePTwQLui0udXXFrhL7Tjw+epudZV3CDenBpkaDIGHOb3vOHN/q/lhgyuaTE
+KN02DGQ1ThBdpAbUJksMj3S8X4aYtZK5Q71o7szjuamf+UseausaLs47BaNKqLugfDNFFl
+oK2A5VCwJrt+o1wdet86JSnwr5lcJlSF4X9N8Ju6W0qJ/RWoE6znRpuCsVq90i0cgFaVIA
+OE8CeHdjpXHijVqW/cFbH2IDyUYzSdr5Ke1fow0M61n22D9lm16mXBs5OmkZ5yrb7vJCB7
+U2VYIrZIsGQh2VMC/HOt3Ms3HE08jI97MDX/4LlmQEzZwDLYArK7JVVpTCvjdTiY2XrSd6
+ZRE5Mw1J5QYHHdw18Ia+tvKVlcQL+RwbTDYzBQrkmHIJ7xYAO5QAtRMZnwSGRyq+f8uhEU
+nGz9lcHnccxsF6BxuT0XHe1gcUnU71Uffm+D9NLf9xGxEgWkoJK4+/K5DxRYXxYj2iWSMg
+xQGBlJ2l92yvGabNDbfgqgsvVsTWg=
+-----END OPENSSH PRIVATE KEY-----
+`),
+	},
+	{
+		Name:          "dsa-encrypted-aes256-cbc",
 		EncryptionKey: "qG0pher-dsa_t3st$",
 		PEMBytes: []byte(`-----BEGIN DSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
@@ -133,8 +182,8 @@ IiHM7GBn+0nJoKTXsOGMIBe3ulKlKVxLjEuk9yivh/8=
 -----END DSA PRIVATE KEY-----
 `),
 	},
-	2: {
-		Name:          "rsa-openssh-encrypted",
+	{
+		Name:          "rsa-openssh-encrypted-aes256-cbc",
 		EncryptionKey: "12345",
 		PEMBytes: []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jYmMAAAAGYmNyeXB0AAAAGAAAABAr17kxS0
@@ -155,8 +204,8 @@ uxJ4W16r7KrATcy4l5F45EyinbHR020=
 -----END OPENSSH PRIVATE KEY-----
 `),
 	},
-	3: {
-		Name:          "ed25519-openssh-encrypted",
+	{
+		Name:          "ed25519-openssh-encrypted-aes256-cbc",
 		EncryptionKey: "quohwan1Ae",
 		PEMBytes: []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jYmMAAAAGYmNyeXB0AAAAGAAAABBkYM/1no
@@ -166,5 +215,61 @@ KkgIWxvVVzi8SxJmR2znR4PU26HpX3QUDdOf6ET3BATO9VVWkbBUUqt0VnwB1CI498OYuQ
 uFv91uY8u4KfYYFN7qZw4sjjPa5m+u1cIGwqVDoNDXR7OddStXwDCcn/9Wq+t2/LoavtsC
 MgjCX2e9GImZ7kbA==
 -----END OPENSSH PRIVATE KEY-----
+	`),
+	},
+	{
+		Name:          "ed25519-openssh-encrypted-aes256-ctr",
+		EncryptionKey: "1234",
+		PEMBytes: []byte(`-----BEGIN OPENSSH PRIVATE KEY-----
+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
+s4LetqIGnhtXJnHsb2en0cZaM=
+-----END OPENSSH PRIVATE KEY-----
 `),
-	}}
+	},
+}

@@ -21,23 +21,26 @@ func testSigners(t *testing.T, name string, a ssh.Signer, b ssh.Signer) {
 	require.NoError(t, err, "verify failed for "+name)
 }
 
-func TestMarshal(t *testing.T) {
+func TestMarshalOldFormat(t *testing.T) {
 	password := []byte("gopher")
 	for _, k := range testdata.PEMEncryptedKeys {
-		pk, err := ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
-		require.NoError(t, err, "error parsing "+k.Name)
-		require.NotNil(t, pk, "nil return from parsing "+k.Name)
-
-		signer, err := ssh.NewSignerFromKey(pk)
-		require.NoError(t, err)
-
-		data, err := Marshal(pk, &MarshalOptions{
-			Passphrase: password,
-			Format:     FormatClassicPEM,
-		})
-
 		// ed25519 is only specified in the new format
-		if k.Name != "ed25519-openssh-encrypted" {
+		if k.Name == "ed25519-openssh-encrypted-aes256-cbc" || k.Name == "ed25519-openssh-encrypted-aes256-ctr" {
+			continue
+		}
+		t.Run(k.Name, func(t *testing.T) {
+			pk, err := ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
+			require.NoError(t, err, "error parsing "+k.Name)
+			require.NotNil(t, pk, "nil return from parsing "+k.Name)
+
+			signer, err := ssh.NewSignerFromKey(pk)
+			require.NoError(t, err)
+
+			data, err := Marshal(pk, &MarshalOptions{
+				Passphrase: password,
+				Format:     FormatClassicPEM,
+			})
+
 			require.NoError(t, err)
 			require.NotNil(t, data, "nil return from marshaling "+k.Name)
 
@@ -49,27 +52,41 @@ func TestMarshal(t *testing.T) {
 			require.NoError(t, err)
 
 			testSigners(t, k.Name, signer, signer2)
-		}
-
-		// now use new format
-		data, err = Marshal(pk, &MarshalOptions{
-			Passphrase: password,
-			Format:     FormatOpenSSHv1,
 		})
-		if err != nil && err.Error() == "sshkeys: unsupported key type *dsa.PrivateKey" {
+	}
+}
+
+func TestMarshalNewFormat(t *testing.T) {
+	password := []byte("gopher")
+	for _, k := range testdata.PEMEncryptedKeys {
+		if k.Name == "dsa-encrypted-aes256-cbc" {
 			continue
 		}
-		require.NoError(t, err)
-		require.NotNil(t, data, "nil return from marshaling "+k.Name)
 
-		//		println("input: " + string(data))
-		pk3, err := ParseEncryptedRawPrivateKey(data, password)
-		require.NoError(t, err, "error from parsing "+k.Name)
-		require.NotNil(t, pk3, "nil return from parsing "+k.Name)
+		t.Run(k.Name, func(t *testing.T) {
+			pk, err := ParseEncryptedRawPrivateKey(k.PEMBytes, []byte(k.EncryptionKey))
+			require.NoError(t, err, "error parsing "+k.Name)
+			require.NotNil(t, pk, "nil return from parsing "+k.Name)
 
-		signer3, err := ssh.NewSignerFromKey(pk3)
-		require.NoError(t, err)
+			signer, err := ssh.NewSignerFromKey(pk)
+			require.NoError(t, err)
 
-		testSigners(t, k.Name, signer, signer3)
+			data, err := Marshal(pk, &MarshalOptions{
+				Passphrase: password,
+				Format:     FormatOpenSSHv1,
+			})
+
+			require.NoError(t, err)
+			require.NotNil(t, data, "nil return from marshaling "+k.Name)
+
+			pk2, err := ParseEncryptedRawPrivateKey(data, password)
+			require.NoError(t, err, "error from parsing "+k.Name)
+			require.NotNil(t, pk2, "nil return from parsing "+k.Name)
+
+			signer2, err := ssh.NewSignerFromKey(pk2)
+			require.NoError(t, err)
+
+			testSigners(t, k.Name, signer, signer2)
+		})
 	}
 }
