@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -18,9 +19,6 @@ import (
 	"strings"
 
 	"github.com/dchest/bcrypt_pbkdf"
-
-	"crypto/rsa"
-
 	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/ssh"
 )
@@ -112,28 +110,9 @@ func parseOpenSSHPrivateKey(data []byte, passphrase []byte) (interface{}, error)
 	var encrypted bool
 
 	switch {
-	// OpenSSH currently only supports bcrypt KDF w/ AES256-CBC mode
+	// OpenSSH supports bcrypt KDF w/ AES256-CBC or AES256-CTR mode
 	case w.KdfName == "bcrypt" && w.CipherName == "aes256-cbc":
-		cipherKeylen := keySizeAES256
-		cipherIvLen := aes.BlockSize
-
-		var opts struct {
-			Salt   []byte
-			Rounds uint32
-		}
-
-		if err := ssh.Unmarshal([]byte(w.KdfOpts), &opts); err != nil {
-			return nil, err
-		}
-		kdfdata, err := bcrypt_pbkdf.Key(passphrase, opts.Salt, int(opts.Rounds), cipherKeylen+cipherIvLen)
-		if err != nil {
-			return nil, err
-		}
-
-		iv := kdfdata[cipherKeylen : cipherIvLen+cipherKeylen]
-		aeskey := kdfdata[0:cipherKeylen]
-		block, err := aes.NewCipher(aeskey)
-
+		iv, block, err := extractBcryptIvBlock(passphrase, w)
 		if err != nil {
 			return nil, err
 		}
@@ -143,8 +122,22 @@ func parseOpenSSHPrivateKey(data []byte, passphrase []byte) (interface{}, error)
 		cbc.CryptBlocks(privateKeyBytes, privateKeyBytes)
 
 		encrypted = true
+
+	case w.KdfName == "bcrypt" && w.CipherName == "aes256-ctr":
+		iv, block, err := extractBcryptIvBlock(passphrase, w)
+		if err != nil {
+			return nil, err
+		}
+
+		stream := cipher.NewCTR(block, iv)
+		privateKeyBytes = []byte(w.PrivKeyBlock)
+		stream.XORKeyStream(privateKeyBytes, privateKeyBytes)
+
+		encrypted = true
+
 	case w.KdfName == "none" && w.CipherName == "none":
 		privateKeyBytes = []byte(w.PrivKeyBlock)
+
 	default:
 		return nil, fmt.Errorf("sshkeys: unknown Cipher/KDF: %s:%s", w.CipherName, w.KdfName)
 	}
@@ -220,4 +213,32 @@ func parseOpenSSHPrivateKey(data []byte, passphrase []byte) (interface{}, error)
 	default:
 		return nil, errors.New("sshkeys: unhandled key type")
 	}
+}
+
+func extractBcryptIvBlock(passphrase []byte, w opensshHeader) ([]byte, cipher.Block, error) {
+	cipherKeylen := keySizeAES256
+	cipherIvLen := aes.BlockSize
+
+	var opts struct {
+		Salt   []byte
+		Rounds uint32
+	}
+
+	if err := ssh.Unmarshal([]byte(w.KdfOpts), &opts); err != nil {
+		return nil, nil, err
+	}
+	kdfdata, err := bcrypt_pbkdf.Key(passphrase, opts.Salt, int(opts.Rounds), cipherKeylen+cipherIvLen)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	iv := kdfdata[cipherKeylen : cipherIvLen+cipherKeylen]
+	aeskey := kdfdata[0:cipherKeylen]
+	block, err := aes.NewCipher(aeskey)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return iv, block, nil
 }
