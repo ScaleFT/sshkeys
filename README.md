@@ -10,4 +10,5 @@
 ## Supported Formats
 
 * OpenSSH's [PROTOCOL.key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key) for RSA and ED25519 keys.
+* OpenSSH version >= 7.6 using aes256-ctr encryption
 * "Classic" PEM containing RSA (PKCS#1), DSA (OpenSSL), and ECDSA private keys.
