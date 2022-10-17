@@ -284,7 +284,9 @@ func marshalOpenssh(pk interface{}, opts *MarshalOptions) ([]byte, error) {
 
 		out.KdfOpts = string(ssh.Marshal(&opts))
 	} else {
-		out.PrivKeyBlock = string(ssh.Marshal(pk1))
+		blocksize = 8
+		pkblock := padBytes(ssh.Marshal(pk1), blocksize)
+		out.PrivKeyBlock = string(pkblock)
 	}
 
 	outBytes := []byte(opensshv1Magic)
