@@ -180,7 +180,7 @@ func marshalOpenssh(pk interface{}, opts *MarshalOptions) ([]byte, error) {
 		blocksize = aes.BlockSize
 	}
 
-	// Get a crypto rand in the range [0, uint32-max)
+	// Get a crypto rand in the range [0, uint32-max]
 	randnum, err := rand.Int(rand.Reader, big.NewInt(math.MaxUint32+1))
 	if err != nil {
 		return nil, fmt.Errorf("sshkeys: failed to get random number: %w", err)
