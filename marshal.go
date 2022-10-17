@@ -11,11 +11,12 @@ import (
 	"encoding/asn1"
 	"encoding/pem"
 	"fmt"
+	"math"
+	"math/big"
+
 	"github.com/dchest/bcrypt_pbkdf"
 	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/ssh"
-	"math"
-	"math/big"
 )
 
 const keySizeAES256 = 32
